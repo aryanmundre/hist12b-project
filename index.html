@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LA Street Vendors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #1f9ce4;
+    --sky-deep: #1482c8;
+    --navy: #0e2a47;
+    --paper: #fffdf8;
+    --display: "Playfair Display", "Iowan Old Style", Georgia, serif;
+    --text: "Source Serif 4", Georgia, serif;
+    --label: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --bar-h: 52px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--text);
+    color: var(--navy);
+    background: radial-gradient(120% 90% at 50% 35%, var(--sky) 0%, var(--sky-deep) 100%) fixed;
+    overflow-x: hidden;
+  }
+
+  /* ---------- Umbrella (fixed, driven by scroll) ---------- */
+  #shadow, #umbrella {
+    position: fixed;
+    top: 0; left: 0;
+    transform-origin: 50% 50%;
+    will-change: transform, opacity;
+    pointer-events: none;
+  }
+  #umbrella { z-index: 20; }
+  #umbrella svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  #shadow {
+    z-index: 19;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(6, 40, 80, .38) 60%, rgba(6, 40, 80, 0) 100%);
+  }
+
+  /* ---------- Menu: one umbrella panel per page section ---------- */
+  #menu {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 30;
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    filter: drop-shadow(0 3px 6px rgba(6, 40, 80, .28));
+  }
+  #menu a {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    height: var(--bar-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 8px;            /* optical centering above the scalloped edge */
+    font-family: var(--label);
+    font-weight: 600;
+    font-size: clamp(11px, 1.25vw, 14px);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink, #fff);
+    transition: height .18s ease;
+  }
+  #menu a svg {                      /* the panel itself, with fabric sagging between the ribs */
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    z-index: -1;
+  }
+  #menu a + a::before {              /* rib between panels */
+    content: "";
+    position: absolute;
+    left: -.5px; top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(14, 42, 71, .35);
+  }
+  #menu a:hover, #menu a:focus-visible, #menu a.active { height: calc(var(--bar-h) + 8px); outline: none; }
+  #menu a:focus-visible span { text-decoration: underline; text-underline-offset: 4px; }
+
+  /* ---------- Intro ---------- */
+  .hero {
+    position: relative;
+    height: 100vh;
+    height: 100svh;
+  }
+  .hero-text {
+    position: absolute;
+    left: 0; right: 0;
+    top: 69%;
+    text-align: center;
+    padding: 0 16px;
+    color: #fff;
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: min(8.5vw, 10vh, 5.5rem);
+    line-height: 1.05;
+    letter-spacing: -.01em;
+  }
+  .scroll-cue {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 3vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--label);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .9);
+  }
+  .scroll-cue svg { width: 18px; height: 18px; animation: bob 1.8s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+
+  /* ---------- Placeholder content ---------- */
+  main { position: relative; z-index: 1; padding: 6vh 16px 20vh; }
+  section.block {
+    max-width: 720px;
+    margin: 0 auto 6vh;
+    padding: clamp(24px, 5vw, 48px);
+    background: var(--paper);
+    border-top: 5px solid var(--accent, var(--navy));
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(6, 40, 80, .2), 0 10px 30px rgba(6, 40, 80, .18);
+    scroll-margin-top: calc(var(--bar-h) + 32px);
+  }
+  section.block .kicker {
+    font-family: var(--label);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    opacity: .6;
+  }
+  section.block h2 {
+    margin: .3em 0 .5em;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.3rem);
+    line-height: 1.15;
+  }
+  section.block p { margin: 0; font-size: 1.1rem; line-height: 1.65; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .scroll-cue svg { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="shadow" aria-hidden="true"></div>
+<div id="umbrella" aria-hidden="true">
+  <svg viewBox="-100 -100 200 200" id="umbrella-svg"></svg>
+</div>
+
+<nav id="menu" aria-label="Main"></nav>
+
+<header class="hero" id="top">
+  <div class="hero-text" id="hero-text">
+    <h1>LA Street Vendors</h1>
+  </div>
+  <div class="scroll-cue" id="scroll-cue">
+    <span>Scroll</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l7 7 7-7"/></svg>
+  </div>
+</header>
+
+<main id="content"></main>
+
+<script>
+(() => {
+  /* ----- Page sections: edit this list and the umbrella, menu and page all follow. -----
+     The umbrella gets two panels per section (so the half facing you has exactly one each). */
+  const SECTIONS = [
+    { id: 'history', title: 'History', blurb: 'Placeholder — the story of street vending in Los Angeles goes here.' },
+    { id: 'vendors', title: 'Vendors', blurb: 'Placeholder — profiles of vendors and what they sell.' },
+    { id: 'map',     title: 'Map',     blurb: 'Placeholder — where vending happens across the city.' },
+    { id: 'voices',  title: 'Voices',  blurb: 'Placeholder — interviews, quotes and oral histories.' },
+    { id: 'about',   title: 'About',   blurb: 'Placeholder — about this class project and its sources.' },
+  ];
+  // Rainbow palette; `ink` is the label colour that reads on it.
+  const PALETTE = [
+    { c: '#e6332a', ink: '#fff' },     // red
+    { c: '#f58220', ink: '#0e2a47' },  // orange
+    { c: '#ffd400', ink: '#0e2a47' },  // yellow
+    { c: '#3aaa35', ink: '#fff' },     // green
+    { c: '#00a99d', ink: '#fff' },     // teal
+    { c: '#1d71b8', ink: '#fff' },     // blue
+    { c: '#662d91', ink: '#fff' },     // purple
+    { c: '#e6007e', ink: '#fff' },     // pink
+  ];
+  const N = SECTIONS.length;
+  // Spread the sections evenly across the rainbow.
+  const colors = SECTIONS.map((_, i) => PALETTE[Math.round(i * PALETTE.length / N) % PALETTE.length]);
+
+  /* ----- Build menu + placeholder sections ----- */
+  const menu = document.getElementById('menu');
+  const content = document.getElementById('content');
+  SECTIONS.forEach((s, i) => {
+    const a = document.createElement('a');
+    a.href = '#' + s.id;
+    a.style.setProperty('--ink', colors[i].ink);
+    a.innerHTML =
+      `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+         <path d="M0 0H100V100Q50 68 0 100Z" fill="${colors[i].c}"/></svg><span>${s.title}</span>`;
+    menu.appendChild(a);
+
+    const sec = document.createElement('section');
+    sec.className = 'block';
+    sec.id = s.id;
+    sec.style.setProperty('--accent', colors[i].c);
+    sec.innerHTML = `<div class="kicker">Part ${i + 1}</div><h2>${s.title}</h2><p>${s.blurb}</p>`;
+    content.appendChild(sec);
+  });
+
+  /* ----- Draw the umbrella ----- */
+  const PANELS = N * 2;
+  const R = 100, SAG = 0.9; // fabric dips inward between rib tips
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.getElementById('umbrella-svg');
+  const pt = (deg, r) => {
+    const a = deg * Math.PI / 180;
+    return [(Math.cos(a) * r).toFixed(2), (Math.sin(a) * r).toFixed(2)];
+  };
+  const el = (name, attrs) => {
+    const n = document.createElementNS(NS, name);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    svg.appendChild(n);
+    return n;
+  };
+  const step = 360 / PANELS;
+  for (let i = 0; i < PANELS; i++) {
+    const a0 = i * step, a1 = a0 + step;
+    const [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R), [cx, cy] = pt(a0 + step / 2, R * SAG);
+    // Ordered so the half facing the viewer after the spin matches the menu, left to right.
+    el('path', { d: `M0 0 L${x0} ${y0} Q${cx} ${cy} ${x1} ${y1} Z`, fill: colors[(2 * N - 1 - i) % N].c });
+  }
+  for (let i = 0; i < PANELS; i++) {
+    const [x, y] = pt(i * step, R);
+    el('line', { x1: 0, y1: 0, x2: x, y2: y, stroke: 'rgba(14,42,71,.35)', 'stroke-width': .5 });
+    el('circle', { cx: x, cy: y, r: 1.1, fill: '#0e2a47' });
+  }
+  el('circle', { r: 4, fill: '#fffdf8', stroke: '#0e2a47', 'stroke-width': 1 });
+  el('circle', { r: 1.3, fill: '#0e2a47' });
+
+  /* ----- Scroll-driven transform ----- */
+  const umbrella = document.getElementById('umbrella');
+  const shadow = document.getElementById('shadow');
+  const heroText = document.getElementById('hero-text');
+  const cue = document.getElementById('scroll-cue');
+  const links = [...menu.children];
+  const blocks = [...content.children];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+  let vw, vh, D, startScale, startY, barH, endTilt;
+
+  function measure() {
+    vw = document.documentElement.clientWidth;
+    vh = window.innerHeight;
+    barH = menu.firstElementChild.offsetHeight || 52;
+    // Laid out at its final (largest) size and scaled DOWN for the intro, so it stays crisp.
+    D = vw * 1.15;
+    const introSize = Math.min(vw * 0.8, vh * 0.52);
+    startScale = introSize / D;
+    startY = vh * 0.38;
+    endTilt = Math.acos(barH / (D / 2)) * 180 / Math.PI;   // edge-on: canopy hangs exactly one bar-height
+    for (const n of [umbrella, shadow]) { n.style.width = n.style.height = D + 'px'; }
+    update();
+  }
+
+  function update() {
+    const raw = clamp(window.scrollY / (vh * 0.85), 0, 1);
+    const p = ease(raw);
+
+    const scale = lerp(startScale, 1, p);
+    const tilt = lerp(0, endTilt, p);
+    const spin = reduceMotion ? 0 : lerp(0, 360, p);
+    const y = lerp(startY, 0, p);
+    const tx = vw / 2 - D / 2, ty = y - D / 2;
+
+    umbrella.style.transform =
+      `translate(${tx}px, ${ty}px) rotateX(${tilt}deg) rotateZ(${spin}deg) scale(${scale})`;
+
+    const off = lerp(startScale * D * 0.07, 8, p);
+    shadow.style.transform =
+      `translate(${tx + off * (1 - p)}px, ${ty + off}px) rotateX(${tilt}deg) scale(${scale * 1.02})`;
+
+    heroText.style.opacity = cue.style.opacity = clamp(1 - raw * 2.2, 0, 1);
+
+    // Hand-off: the flat menu fades in over the edge-on umbrella, then the umbrella drops away.
+    const m = clamp((raw - 0.78) / 0.16, 0, 1);
+    menu.style.opacity = m;
+    menu.style.visibility = m > 0 ? 'visible' : 'hidden';
+    const out = 1 - clamp((raw - 0.92) / 0.08, 0, 1);
+    umbrella.style.opacity = shadow.style.opacity = out;
+
+    // Highlight the panel for the section being read.
+    let current = -1;
+    blocks.forEach((b, i) => { if (b.getBoundingClientRect().top < vh * 0.45) current = i; });
+    links.forEach((a, i) => a.classList.toggle('active', i === current));
+  }
+
+  let ticking = false;
+  addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { ticking = false; update(); });
+  }, { passive: true });
+  addEventListener('resize', measure);
+  measure();
+})();
+</script>
+</body>
+</html>
