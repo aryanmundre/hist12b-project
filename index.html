@@ -1,335 +1,729 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LA Street Vendors</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --sky: #1f9ce4;
-    --sky-deep: #1482c8;
-    --navy: #0e2a47;
-    --paper: #fffdf8;
-    --display: "Playfair Display", "Iowan Old Style", Georgia, serif;
-    --text: "Source Serif 4", Georgia, serif;
-    --label: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --bar-h: 52px;
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin: 0;
-    font-family: var(--text);
-    color: var(--navy);
-    background: radial-gradient(120% 90% at 50% 35%, var(--sky) 0%, var(--sky-deep) 100%) fixed;
-    overflow-x: hidden;
-  }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LA Street Vendors</title>
 
-  /* ---------- Umbrella (fixed, driven by scroll) ---------- */
-  #shadow, #umbrella {
-    position: fixed;
-    top: 0; left: 0;
-    transform-origin: 50% 50%;
-    will-change: transform, opacity;
-    pointer-events: none;
-  }
-  #umbrella { z-index: 20; }
-  #umbrella svg { display: block; width: 100%; height: 100%; overflow: visible; }
-  #shadow {
-    z-index: 19;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, rgba(6, 40, 80, .38) 60%, rgba(6, 40, 80, 0) 100%);
-  }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  >
 
-  /* ---------- Menu: one umbrella panel per page section ---------- */
-  #menu {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 30;
-    display: flex;
-    opacity: 0;
-    visibility: hidden;
-    filter: drop-shadow(0 3px 6px rgba(6, 40, 80, .28));
-  }
-  #menu a {
-    position: relative;
-    flex: 1 1 0;
-    min-width: 0;
-    height: var(--bar-h);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-bottom: 8px;            /* optical centering above the scalloped edge */
-    font-family: var(--label);
-    font-weight: 600;
-    font-size: clamp(11px, 1.25vw, 14px);
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    text-decoration: none;
-    color: var(--ink, #fff);
-    transition: height .18s ease;
-  }
-  #menu a svg {                      /* the panel itself, with fabric sagging between the ribs */
-    position: absolute;
-    inset: 0;
-    width: 100%; height: 100%;
-    z-index: -1;
-  }
-  #menu a + a::before {              /* rib between panels */
-    content: "";
-    position: absolute;
-    left: -.5px; top: 0; bottom: 0;
-    width: 1px;
-    background: rgba(14, 42, 71, .35);
-  }
-  #menu a:hover, #menu a:focus-visible, #menu a.active { height: calc(var(--bar-h) + 8px); outline: none; }
-  #menu a:focus-visible span { text-decoration: underline; text-underline-offset: 4px; }
+  <style>
+    :root {
+      --sky: #1f9ce4;
+      --sky-deep: #1482c8;
+      --navy: #0e2a47;
+      --paper: #fffdf8;
+      --display: "Playfair Display", "Iowan Old Style", Georgia, serif;
+      --text: "Source Serif 4", Georgia, serif;
+      --label: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --bar-h: 52px;
+    }
 
-  /* ---------- Intro ---------- */
-  .hero {
-    position: relative;
-    height: 100vh;
-    height: 100svh;
-  }
-  .hero-text {
-    position: absolute;
-    left: 0; right: 0;
-    top: 69%;
-    text-align: center;
-    padding: 0 16px;
-    color: #fff;
-  }
-  h1 {
-    margin: 0;
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: min(8.5vw, 10vh, 5.5rem);
-    line-height: 1.05;
-    letter-spacing: -.01em;
-  }
-  .scroll-cue {
-    position: absolute;
-    left: 0; right: 0;
-    bottom: 3vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--label);
-    font-weight: 600;
-    font-size: 11px;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, .9);
-  }
-  .scroll-cue svg { width: 18px; height: 18px; animation: bob 1.8s ease-in-out infinite; }
-  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+    * {
+      box-sizing: border-box;
+    }
 
-  /* ---------- Placeholder content ---------- */
-  main { position: relative; z-index: 1; padding: 6vh 16px 20vh; }
-  section.block {
-    max-width: 720px;
-    margin: 0 auto 6vh;
-    padding: clamp(24px, 5vw, 48px);
-    background: var(--paper);
-    border-top: 5px solid var(--accent, var(--navy));
-    border-radius: 2px;
-    box-shadow: 0 1px 2px rgba(6, 40, 80, .2), 0 10px 30px rgba(6, 40, 80, .18);
-    scroll-margin-top: calc(var(--bar-h) + 32px);
-  }
-  section.block .kicker {
-    font-family: var(--label);
-    font-weight: 700;
-    font-size: 11px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    opacity: .6;
-  }
-  section.block h2 {
-    margin: .3em 0 .5em;
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: clamp(1.6rem, 4vw, 2.3rem);
-    line-height: 1.15;
-  }
-  section.block p { margin: 0; font-size: 1.1rem; line-height: 1.65; }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    .scroll-cue svg { animation: none; }
-  }
-</style>
+    body {
+      margin: 0;
+      font-family: var(--text);
+      color: var(--navy);
+      background:
+        radial-gradient(
+          120% 90% at 50% 35%,
+          var(--sky) 0%,
+          var(--sky-deep) 100%
+        ) fixed;
+      overflow-x: hidden;
+    }
+
+    /* Original umbrella and shadow. */
+    #shadow,
+    #umbrella {
+      position: fixed;
+      top: 0;
+      left: 0;
+      transform-origin: 50% 50%;
+      will-change: transform, opacity;
+      pointer-events: none;
+    }
+
+    #umbrella {
+      z-index: 20;
+    }
+
+    #umbrella svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    #shadow {
+      z-index: 19;
+      border-radius: 50%;
+      background:
+        radial-gradient(
+          closest-side,
+          rgba(6, 40, 80, .38) 60%,
+          rgba(6, 40, 80, 0) 100%
+        );
+    }
+
+    /* Original navigation panels. */
+    #menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      display: flex;
+      opacity: 0;
+      visibility: hidden;
+      filter: drop-shadow(0 3px 6px rgba(6, 40, 80, .28));
+    }
+
+    #menu a {
+      position: relative;
+      flex: 1 1 0;
+      min-width: 0;
+      height: var(--bar-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 8px;
+      font-family: var(--label);
+      font-weight: 600;
+      font-size: clamp(11px, 1.25vw, 14px);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--ink, #fff);
+      transition: height .18s ease;
+    }
+
+    #menu a svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    #menu a + a::before {
+      content: "";
+      position: absolute;
+      left: -.5px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: rgba(14, 42, 71, .35);
+    }
+
+    #menu a:hover,
+    #menu a:focus-visible,
+    #menu a.active {
+      height: calc(var(--bar-h) + 8px);
+      outline: none;
+    }
+
+    #menu a:focus-visible span {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    /* Original cover. */
+    .hero {
+      position: relative;
+      height: 100vh;
+      height: 100svh;
+    }
+
+    .hero-text {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 69%;
+      text-align: center;
+      padding: 0 16px;
+      color: #fff;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: min(8.5vw, 10vh, 5.5rem);
+      line-height: 1.05;
+      letter-spacing: -.01em;
+    }
+
+    .scroll-cue {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 3vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--label);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .9);
+    }
+
+    .scroll-cue svg {
+      width: 18px;
+      height: 18px;
+      animation: bob 1.8s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(5px);
+      }
+    }
+
+    /* Shared editorial layout. */
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    section.block {
+      margin: 0;
+      padding:
+        clamp(50px, 9vw, 140px)
+        max(7vw, calc((100vw - 900px) / 2));
+      scroll-margin-top: calc(var(--bar-h) + 32px);
+    }
+
+    section.block h2 {
+      margin: .3em 0 .45em;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(2.4rem, 6vw, 5.4rem);
+      line-height: 1.02;
+      letter-spacing: -.045em;
+      text-wrap: balance;
+    }
+
+    section.block h3 {
+      margin: 0 0 .55em;
+      font-family: var(--display);
+      font-size: clamp(1.3rem, 2.8vw, 1.8rem);
+      line-height: 1.2;
+    }
+
+    section.block p {
+      margin: 0;
+      font-size: 1.1rem;
+      line-height: 1.65;
+    }
+
+    section.block small,
+    section.block dt {
+      font-family: var(--label);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+    }
+
+    /* About — newspaper-style opening. */
+    .section-about {
+      background: #fff7e7;
+    }
+
+    .lede:first-letter {
+      float: left;
+      padding: .08em .09em 0 0;
+      font-size: 3.8em;
+      line-height: .9;
+      color: #9b392a;
+    }
+
+    /* People — expandable perspectives. */
+    .section-people {
+      background: #d9ebdb;
+    }
+
+    .section-people details {
+      border-bottom: 1px solid #779585;
+      padding: 1em 0;
+    }
+
+    .section-people summary {
+      cursor: pointer;
+      font-family: var(--label);
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .section-people summary:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 5px;
+    }
+
+    .section-people details p {
+      padding: .6em 0 0 1.2em;
+    }
+
+    /* Why It Matters — side-by-side comparison. */
+    .section-matters {
+      background: #f7c955;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    }
+
+    .split article {
+      padding: 1.4em;
+      background: #fff4d8;
+    }
+
+    .split article + article {
+      background: #3b3029;
+      color: white;
+    }
+
+    /* Interviews — dark feature section. */
+    .section-interviews {
+      background: #182933;
+      color: #fff9eb;
+    }
+
+    .section-interviews hr {
+      margin: 2rem 0;
+      border: 0;
+      border-top: 1px solid #879a9f;
+    }
+
+    /* Sources — compact reference index. */
+    .section-sources {
+      background: #f2f0e9;
+    }
+
+    .section-sources dl {
+      display: grid;
+      grid-template-columns: auto 1fr;
+    }
+
+    .section-sources dt,
+    .section-sources dd {
+      margin: 0;
+      padding: 1rem .4rem;
+      border-top: 1px solid #9d9b92;
+    }
+
+    .section-sources dd {
+      overflow-wrap: anywhere;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .scroll-cue svg {
+        animation: none;
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <div id="shadow" aria-hidden="true"></div>
 
-<div id="shadow" aria-hidden="true"></div>
-<div id="umbrella" aria-hidden="true">
-  <svg viewBox="-100 -100 200 200" id="umbrella-svg"></svg>
-</div>
-
-<nav id="menu" aria-label="Main"></nav>
-
-<header class="hero" id="top">
-  <div class="hero-text" id="hero-text">
-    <h1>LA Street Vendors</h1>
+  <div id="umbrella" aria-hidden="true">
+    <svg viewBox="-100 -100 200 200" id="umbrella-svg"></svg>
   </div>
-  <div class="scroll-cue" id="scroll-cue">
-    <span>Scroll</span>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l7 7 7-7"/></svg>
-  </div>
-</header>
 
-<main id="content"></main>
+  <nav id="menu" aria-label="Main"></nav>
 
-<script>
-(() => {
-  /* ----- Page sections: edit this list and the umbrella, menu and page all follow. -----
-     The umbrella gets two panels per section (so the half facing you has exactly one each). */
-  const SECTIONS = [
-    { id: 'history', title: 'History', blurb: 'Placeholder — the story of street vending in Los Angeles goes here.' },
-    { id: 'vendors', title: 'Vendors', blurb: 'Placeholder — profiles of vendors and what they sell.' },
-    { id: 'map',     title: 'Map',     blurb: 'Placeholder — where vending happens across the city.' },
-    { id: 'voices',  title: 'Voices',  blurb: 'Placeholder — interviews, quotes and oral histories.' },
-    { id: 'about',   title: 'About',   blurb: 'Placeholder — about this class project and its sources.' },
-  ];
-  // Rainbow palette; `ink` is the label colour that reads on it.
-  const PALETTE = [
-    { c: '#e6332a', ink: '#fff' },     // red
-    { c: '#f58220', ink: '#0e2a47' },  // orange
-    { c: '#ffd400', ink: '#0e2a47' },  // yellow
-    { c: '#3aaa35', ink: '#fff' },     // green
-    { c: '#00a99d', ink: '#fff' },     // teal
-    { c: '#1d71b8', ink: '#fff' },     // blue
-    { c: '#662d91', ink: '#fff' },     // purple
-    { c: '#e6007e', ink: '#fff' },     // pink
-  ];
-  const N = SECTIONS.length;
-  // Spread the sections evenly across the rainbow.
-  const colors = SECTIONS.map((_, i) => PALETTE[Math.round(i * PALETTE.length / N) % PALETTE.length]);
+  <header class="hero" id="top">
+    <div class="hero-text" id="hero-text">
+      <h1>LA Street Vendors</h1>
+    </div>
 
-  /* ----- Build menu + placeholder sections ----- */
-  const menu = document.getElementById('menu');
-  const content = document.getElementById('content');
-  SECTIONS.forEach((s, i) => {
-    const a = document.createElement('a');
-    a.href = '#' + s.id;
-    a.style.setProperty('--ink', colors[i].ink);
-    a.innerHTML =
-      `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-         <path d="M0 0H100V100Q50 68 0 100Z" fill="${colors[i].c}"/></svg><span>${s.title}</span>`;
-    menu.appendChild(a);
+    <div class="scroll-cue" id="scroll-cue">
+      <span>Scroll</span>
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M5 9l7 7 7-7"/>
+      </svg>
+    </div>
+  </header>
 
-    const sec = document.createElement('section');
-    sec.className = 'block';
-    sec.id = s.id;
-    sec.style.setProperty('--accent', colors[i].c);
-    sec.innerHTML = `<div class="kicker">Part ${i + 1}</div><h2>${s.title}</h2><p>${s.blurb}</p>`;
-    content.appendChild(sec);
-  });
+  <main id="content"></main>
 
-  /* ----- Draw the umbrella ----- */
-  const PANELS = N * 2;
-  const R = 100, SAG = 0.9; // fabric dips inward between rib tips
-  const NS = 'http://www.w3.org/2000/svg';
-  const svg = document.getElementById('umbrella-svg');
-  const pt = (deg, r) => {
-    const a = deg * Math.PI / 180;
-    return [(Math.cos(a) * r).toFixed(2), (Math.sin(a) * r).toFixed(2)];
-  };
-  const el = (name, attrs) => {
-    const n = document.createElementNS(NS, name);
-    for (const k in attrs) n.setAttribute(k, attrs[k]);
-    svg.appendChild(n);
-    return n;
-  };
-  const step = 360 / PANELS;
-  for (let i = 0; i < PANELS; i++) {
-    const a0 = i * step, a1 = a0 + step;
-    const [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R), [cx, cy] = pt(a0 + step / 2, R * SAG);
-    // Ordered so the half facing the viewer after the spin matches the menu, left to right.
-    el('path', { d: `M0 0 L${x0} ${y0} Q${cx} ${cy} ${x1} ${y1} Z`, fill: colors[(2 * N - 1 - i) % N].c });
-  }
-  for (let i = 0; i < PANELS; i++) {
-    const [x, y] = pt(i * step, R);
-    el('line', { x1: 0, y1: 0, x2: x, y2: y, stroke: 'rgba(14,42,71,.35)', 'stroke-width': .5 });
-    el('circle', { cx: x, cy: y, r: 1.1, fill: '#0e2a47' });
-  }
-  el('circle', { r: 4, fill: '#fffdf8', stroke: '#0e2a47', 'stroke-width': 1 });
-  el('circle', { r: 1.3, fill: '#0e2a47' });
+  <script>
+    (() => {
+      /*
+       * Five sections retain the original ten-panel umbrella.
+       * Existing section IDs preserve previously shared anchor links.
+       */
+      const SECTIONS = [
+        {
+          id: 'history',
+          title: 'About',
+          className: 'section-about',
+          html: `
+            <small>HIST 12B · LOS ANGELES</small>
 
-  /* ----- Scroll-driven transform ----- */
-  const umbrella = document.getElementById('umbrella');
-  const shadow = document.getElementById('shadow');
-  const heroText = document.getElementById('hero-text');
-  const cue = document.getElementById('scroll-cue');
-  const links = [...menu.children];
-  const blocks = [...content.children];
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            <h2>Street Vending in Los Angeles</h2>
 
-  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  const lerp = (a, b, t) => a + (b - a) * t;
-  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            <p class="lede">
+              Stand beside a fruit cart for a moment.
+              A customer pauses to order, a pedestrian passes,
+              and the vendor makes room for both.
+            </p>
+          `
+        },
+        {
+          id: 'vendors',
+          title: 'People',
+          className: 'section-people',
+          html: `
+            <small>BY BRIAN LI</small>
 
-  let vw, vh, D, startScale, startY, barH, endTilt;
+            <h2>Who Shares the Sidewalk?</h2>
 
-  function measure() {
-    vw = document.documentElement.clientWidth;
-    vh = window.innerHeight;
-    barH = menu.firstElementChild.offsetHeight || 52;
-    // Laid out at its final (largest) size and scaled DOWN for the intro, so it stays crisp.
-    D = vw * 1.15;
-    const introSize = Math.min(vw * 0.8, vh * 0.52);
-    startScale = introSize / D;
-    startY = vh * 0.38;
-    endTilt = Math.acos(barH / (D / 2)) * 180 / Math.PI;   // edge-on: canopy hangs exactly one bar-height
-    for (const n of [umbrella, shadow]) { n.style.width = n.style.height = D + 'px'; }
-    update();
-  }
+            <p>
+              Choose a perspective to see how one corner
+              serves different people.
+            </p>
 
-  function update() {
-    const raw = clamp(window.scrollY / (vh * 0.85), 0, 1);
-    const p = ease(raw);
+            <details open>
+              <summary>The vendor</summary>
+              <p>
+                For the person slicing fruit, the corner is a
+                workplace. Regular customers know where to find
+                the cart.
+              </p>
+            </details>
 
-    const scale = lerp(startScale, 1, p);
-    const tilt = lerp(0, endTilt, p);
-    const spin = reduceMotion ? 0 : lerp(0, 360, p);
-    const y = lerp(startY, 0, p);
-    const tx = vw / 2 - D / 2, ty = y - D / 2;
+            <details>
+              <summary>The customer</summary>
+              <p>
+                For someone walking to work, the same cart can
+                be a familiar breakfast stop.
+              </p>
+            </details>
 
-    umbrella.style.transform =
-      `translate(${tx}px, ${ty}px) rotateX(${tilt}deg) rotateZ(${spin}deg) scale(${scale})`;
+            <details>
+              <summary>Neighbors and shopkeepers</summary>
+              <p>
+                A parent with a stroller needs a clear path.
+                A shopkeeper needs customers to reach the doorway.
+              </p>
+            </details>
 
-    const off = lerp(startScale * D * 0.07, 8, p);
-    shadow.style.transform =
-      `translate(${tx + off * (1 - p)}px, ${ty + off}px) rotateX(${tilt}deg) scale(${scale * 1.02})`;
+            <details>
+              <summary>Officials and organizers</summary>
+              <p>
+                Public officials shape where vending can take place.
+                Vendors and community groups bring their experience
+                of the sidewalk into those decisions.
+              </p>
+            </details>
+          `
+        },
+        {
+          id: 'map',
+          title: 'Why It Matters',
+          className: 'section-matters',
+          html: `
+            <h2>
+              What changes when a cart moves one block?
+            </h2>
 
-    heroText.style.opacity = cue.style.opacity = clamp(1 - raw * 2.2, 0, 1);
+            <div class="split">
+              <article>
+                <h3>For a passerby</h3>
+                <p>
+                  The detour might add a minute to a walk.
+                </p>
+              </article>
 
-    // Hand-off: the flat menu fades in over the edge-on umbrella, then the umbrella drops away.
-    const m = clamp((raw - 0.78) / 0.16, 0, 1);
-    menu.style.opacity = m;
-    menu.style.visibility = m > 0 ? 'visible' : 'hidden';
-    const out = 1 - clamp((raw - 0.92) / 0.08, 0, 1);
-    umbrella.style.opacity = shadow.style.opacity = out;
+              <article>
+                <h3>For a vendor</h3>
+                <p>
+                  Will the morning regulars find the new corner?
+                  How many sales might move with the cart?
+                </p>
+              </article>
+            </div>
+          `
+        },
+        {
+          id: 'voices',
+          title: 'Interviews',
+          className: 'section-interviews',
+          html: `
+            <small>INTERVIEWS</small>
 
-    // Highlight the panel for the section being read.
-    let current = -1;
-    blocks.forEach((b, i) => { if (b.getBoundingClientRect().top < vh * 0.45) current = i; });
-    links.forEach((a, i) => a.classList.toggle('active', i === current));
-  }
+            <h2>In Conversation with Doug Smith</h2>
 
-  let ticking = false;
-  addEventListener('scroll', () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => { ticking = false; update(); });
-  }, { passive: true });
-  addEventListener('resize', measure);
-  measure();
-})();
-</script>
+            <p>Inclusive Action</p>
+
+            <hr>
+
+            <p>
+              Interview video and organization history forthcoming.
+            </p>
+          `
+        },
+        {
+          id: 'about',
+          title: 'Sources',
+          className: 'section-sources',
+          html: `
+            <h2>Sources and Credits</h2>
+
+            <dl>
+              <dt>Interview</dt>
+              <dd>Doug Smith · Inclusive Action</dd>
+
+              <dt>Project</dt>
+              <dd>UCLA · HIST 12B</dd>
+
+              <dt>References</dt>
+              <dd>
+                Article and image citations forthcoming.
+              </dd>
+            </dl>
+          `
+        }
+      ];
+
+      const PALETTE = [
+        { c: '#e6332a', ink: '#fff' },
+        { c: '#f58220', ink: '#0e2a47' },
+        { c: '#ffd400', ink: '#0e2a47' },
+        { c: '#3aaa35', ink: '#fff' },
+        { c: '#00a99d', ink: '#fff' },
+        { c: '#1d71b8', ink: '#fff' },
+        { c: '#662d91', ink: '#fff' },
+        { c: '#e6007e', ink: '#fff' }
+      ];
+
+      const N = SECTIONS.length;
+
+      const colors = SECTIONS.map(
+        (_, i) => PALETTE[
+          Math.round(i * PALETTE.length / N) % PALETTE.length
+        ]
+      );
+
+      /* Build navigation and editorial sections. */
+      const menu = document.getElementById('menu');
+      const content = document.getElementById('content');
+
+      SECTIONS.forEach((s, i) => {
+        const a = document.createElement('a');
+        a.href = '#' + s.id;
+        a.style.setProperty('--ink', colors[i].ink);
+
+        a.innerHTML = `
+          <svg
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M0 0H100V100Q50 68 0 100Z"
+              fill="${colors[i].c}"
+            />
+          </svg>
+          <span>${s.title}</span>
+        `;
+
+        menu.appendChild(a);
+
+        const sec = document.createElement('section');
+        sec.className = 'block ' + s.className;
+        sec.id = s.id;
+        sec.style.setProperty('--accent', colors[i].c);
+        sec.innerHTML = s.html;
+
+        content.appendChild(sec);
+      });
+
+      /* ----- Draw the umbrella ----- */
+      const PANELS = N * 2;
+      const R = 100, SAG = 0.9; // fabric dips inward between rib tips
+      const NS = 'http://www.w3.org/2000/svg';
+      const svg = document.getElementById('umbrella-svg');
+      const pt = (deg, r) => {
+        const a = deg * Math.PI / 180;
+        return [(Math.cos(a) * r).toFixed(2), (Math.sin(a) * r).toFixed(2)];
+      };
+      const el = (name, attrs) => {
+        const n = document.createElementNS(NS, name);
+        for (const k in attrs) n.setAttribute(k, attrs[k]);
+        svg.appendChild(n);
+        return n;
+      };
+      const step = 360 / PANELS;
+      for (let i = 0; i < PANELS; i++) {
+        const a0 = i * step, a1 = a0 + step;
+        const [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R), [cx, cy] = pt(a0 + step / 2, R * SAG);
+        // Ordered so the half facing the viewer after the spin matches the menu, left to right.
+        el('path', { d: `M0 0 L${x0} ${y0} Q${cx} ${cy} ${x1} ${y1} Z`, fill: colors[(2 * N - 1 - i) % N].c });
+      }
+      for (let i = 0; i < PANELS; i++) {
+        const [x, y] = pt(i * step, R);
+        el('line', { x1: 0, y1: 0, x2: x, y2: y, stroke: 'rgba(14,42,71,.35)', 'stroke-width': .5 });
+        el('circle', { cx: x, cy: y, r: 1.1, fill: '#0e2a47' });
+      }
+      el('circle', { r: 4, fill: '#fffdf8', stroke: '#0e2a47', 'stroke-width': 1 });
+      el('circle', { r: 1.3, fill: '#0e2a47' });
+
+      /* ----- Scroll-driven transform ----- */
+      const umbrella = document.getElementById('umbrella');
+      const shadow = document.getElementById('shadow');
+      const heroText = document.getElementById('hero-text');
+      const cue = document.getElementById('scroll-cue');
+      const links = [...menu.children];
+      const blocks = [...content.children];
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+      const lerp = (a, b, t) => a + (b - a) * t;
+      const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+      let vw, vh, D, startScale, startY, barH, endTilt;
+
+      function measure() {
+        vw = document.documentElement.clientWidth;
+        vh = window.innerHeight;
+        barH = menu.firstElementChild.offsetHeight || 52;
+        // Laid out at its final (largest) size and scaled DOWN for the intro, so it stays crisp.
+        D = vw * 1.15;
+        const introSize = Math.min(vw * 0.8, vh * 0.52);
+        startScale = introSize / D;
+        startY = vh * 0.38;
+        endTilt = Math.acos(barH / (D / 2)) * 180 / Math.PI;   // edge-on: canopy hangs exactly one bar-height
+        for (const n of [umbrella, shadow]) { n.style.width = n.style.height = D + 'px'; }
+        update();
+      }
+
+      function update() {
+        const raw = clamp(window.scrollY / (vh * 0.85), 0, 1);
+        const p = ease(raw);
+
+        const scale = lerp(startScale, 1, p);
+        const tilt = lerp(0, endTilt, p);
+        const spin = reduceMotion ? 0 : lerp(0, 360, p);
+        const y = lerp(startY, 0, p);
+        const tx = vw / 2 - D / 2, ty = y - D / 2;
+
+        umbrella.style.transform =
+          `translate(${tx}px, ${ty}px) rotateX(${tilt}deg) rotateZ(${spin}deg) scale(${scale})`;
+
+        const off = lerp(startScale * D * 0.07, 8, p);
+        shadow.style.transform =
+          `translate(${tx + off * (1 - p)}px, ${ty + off}px) rotateX(${tilt}deg) scale(${scale * 1.02})`;
+
+        heroText.style.opacity = cue.style.opacity = clamp(1 - raw * 2.2, 0, 1);
+
+        // Hand-off: the flat menu fades in over the edge-on umbrella, then the umbrella drops away.
+        const m = clamp((raw - 0.78) / 0.16, 0, 1);
+        menu.style.opacity = m;
+        menu.style.visibility = m > 0 ? 'visible' : 'hidden';
+        const out = 1 - clamp((raw - 0.92) / 0.08, 0, 1);
+        umbrella.style.opacity = shadow.style.opacity = out;
+
+        // Highlight the panel for the section being read.
+        let current = -1;
+        blocks.forEach((b, i) => { if (b.getBoundingClientRect().top < vh * 0.45) current = i; });
+        links.forEach((a, i) => a.classList.toggle('active', i === current));
+      }
+
+      let ticking = false;
+      addEventListener('scroll', () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => { ticking = false; update(); });
+      }, { passive: true });
+      addEventListener('resize', measure);
+      measure();
+    })();
+
+    /* Section reveals run independently of the umbrella animation. */
+    (() => {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          const element = entry.target;
+          observer.unobserve(element);
+
+          let transform = 'translateY(16px)';
+
+          if (element.matches('article')) {
+            transform = 'translateX(-16px)';
+          }
+
+          if (element.matches('article:last-child')) {
+            transform = 'translateX(16px)';
+          }
+
+          element.animate(
+            [
+              {
+                opacity: 0,
+                transform
+              },
+              {
+                opacity: 1,
+                transform: 'none'
+              }
+            ],
+            {
+              duration: 560,
+              easing: 'ease-out'
+            }
+          );
+        });
+      });
+
+      document
+        .querySelectorAll('main h2, .split article')
+        .forEach(element => observer.observe(element));
+    })();
+  </script>
 </body>
 </html>
