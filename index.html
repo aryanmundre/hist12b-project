@@ -99,11 +99,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding-bottom: 8px;
+      padding: 0 .2rem 8px;
       font-family: var(--label);
       font-weight: 600;
       font-size: clamp(11px, 1.25vw, 14px);
+      line-height: 1.15;
       letter-spacing: .12em;
+      text-align: center;
       text-transform: uppercase;
       text-decoration: none;
       color: var(--ink, #fff);
@@ -258,6 +260,38 @@
       color: #9b392a;
     }
 
+    .about-copy {
+      max-width: 68ch;
+    }
+
+    .about-copy p + p {
+      margin-top: 1em;
+    }
+
+    .section-about p.about-question {
+      margin: 1.6rem 0;
+      padding-left: 1rem;
+      border-left: 3px solid #9b392a;
+      font-family: var(--display);
+      font-size: clamp(1.3rem, 3vw, 1.85rem);
+      line-height: 1.35;
+    }
+
+    .about-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .65rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .section-about a,
+    .timeline a {
+      color: inherit;
+      font-family: var(--label);
+      font-weight: 600;
+      text-underline-offset: .25em;
+    }
+
     /* People — expandable perspectives. */
     .section-people {
       background: #d9ebdb;
@@ -305,21 +339,136 @@
       color: white;
     }
 
+    .section-org-history {
+      background: #f1e7df;
+    }
+
+    .section-org-history > p {
+      max-width: 68ch;
+    }
+
+    .timeline {
+      margin: 2rem 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .timeline li {
+      display: grid;
+      grid-template-columns: 5rem minmax(0, 1fr);
+    }
+
+    .timeline time {
+      padding-top: .16rem;
+      color: #85382f;
+      font-family: var(--label);
+      font-weight: 700;
+    }
+
+    .timeline-entry {
+      position: relative;
+      padding: 0 0 1.8rem 1.35rem;
+      border-left: 1px solid #b1867d;
+    }
+
+    .timeline-entry::before {
+      content: '';
+      position: absolute;
+      top: .45rem;
+      left: -.3rem;
+      width: .55rem;
+      height: .55rem;
+      border-radius: 50%;
+      background: #85382f;
+    }
+
+    .timeline li:last-child .timeline-entry {
+      padding-bottom: 0;
+    }
+
+    .timeline a {
+      display: inline-block;
+      margin-top: .45rem;
+      font-size: .85rem;
+    }
+
     /* Interviews — dark feature section. */
     .section-interviews {
       background: #182933;
       color: #fff9eb;
     }
 
-    .section-interviews hr {
-      margin: 2rem 0;
+    .interview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+      gap: 1.25rem;
+      margin-top: 1.75rem;
+    }
+
+    .interview-card {
+      min-width: 0;
+      background: #223743;
+      border: 1px solid #536975;
+      border-radius: .75rem;
+      overflow: hidden;
+    }
+
+    .interview-card .interview-window {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      aspect-ratio: 16 / 9;
       border: 0;
-      border-top: 1px solid #879a9f;
+      background: #0e1b23;
+    }
+
+    .interview-window small {
+      padding: 1rem;
+      text-align: center;
+      color: #c9d8de;
+    }
+
+    .interview-description {
+      padding: 1.25rem;
+    }
+
+    .interview-card a {
+      display: inline-block;
+      margin-top: .75rem;
+      color: #ffe095;
+      text-underline-offset: .2em;
     }
 
     /* Sources — compact reference index. */
     .section-sources {
       background: #f2f0e9;
+    }
+
+    .works-cited {
+      display: grid;
+      gap: 1rem;
+      margin: 1.5rem 0 2.5rem;
+      padding: 0;
+      list-style: none;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .works-cited li {
+      padding-left: 1.25em;
+      text-indent: -1.25em;
+    }
+
+    .works-cited a {
+      color: inherit;
+      font-weight: 600;
+      text-underline-offset: .18em;
+      text-decoration-color: #657786;
+    }
+
+    .works-cited a:hover {
+      color: #9b392a;
+      text-decoration-color: currentColor;
     }
 
     .section-sources dl {
@@ -336,6 +485,17 @@
 
     .section-sources dd {
       overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 520px) {
+      #menu a {
+        font-size: clamp(9px, 2.65vw, 11px);
+        letter-spacing: .02em;
+      }
+
+      .timeline li {
+        grid-template-columns: 3.3rem minmax(0, 1fr);
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -382,36 +542,89 @@
 
   <main id="content"></main>
 
+  <template id="interview-card">
+    <article class="interview-card">
+      <div class="interview-window"><small></small></div>
+      <div class="interview-description">
+        <h3></h3>
+        <p></p>
+      </div>
+    </article>
+  </template>
+
   <script>
     (() => {
-      /*
-       * Five sections retain the original ten-panel umbrella.
-       * Existing section IDs preserve previously shared anchor links.
-       */
+      // Add the hosted player URL and direct watch link when each video is ready.
+      const INTERVIEWS = [
+        {
+          name: 'Doug Smith',
+          description: 'Inclusive Action for the City co-founded the LA Street Vendor Campaign. Smith brings a policy and legal perspective to the campaign.',
+          status: 'Recording to be added',
+          embedUrl: '',
+          watchUrl: ''
+        },
+        {
+          name: 'Second interview',
+          description: 'Interviewee and affiliation to be confirmed.',
+          status: 'Recording to be added',
+          embedUrl: '',
+          watchUrl: ''
+        }
+      ];
+
+      // Keep the original section IDs so previously shared links still work.
       const SECTIONS = [
         {
           id: 'history',
           title: 'About',
+          color: '#e6332a',
+          ink: '#fff',
           className: 'section-about',
           html: `
             <small>HIST 12B · LOS ANGELES</small>
 
-            <h2>Street Vending in Los Angeles</h2>
+            <h2>Who gets to make a living on LA’s sidewalks?</h2>
 
-            <p class="lede">
-              Stand beside a fruit cart for a moment.
-              A customer pauses to order, a pedestrian passes,
-              and the vendor makes room for both.
-            </p>
+            <div class="about-copy">
+              <p class="lede">
+                Stand beside a fruit cart for a moment. A customer pauses to order, a pedestrian passes,
+                and the vendor makes room for both. This corner is also a workplace. Finding a place to
+                set up and building a base of regular customers are part of making a living there.
+                City rules help determine where that work can happen and what it takes to keep doing it.
+              </p>
+              <p>
+                This project follows Inclusive Action for the City, a Los Angeles nonprofit that
+                helped found the LA Street Vendor Campaign alongside vendors and other community
+                organizations. The coalition organized for years to end criminal penalties for sidewalk
+                vending and give vendors a way to operate legally. Its work also shows what happens
+                after a law changes. Vendors still have to navigate permits, and those who sell food
+                have to meet health and equipment requirements. The coalition documented these barriers
+                in its <a href="https://inclusiveaction.org/wp-content/uploads/2025/07/Unfinished_Business_Report_6_2021.pdf">Unfinished Business report</a>.
+              </p>
+              <p>
+                For HIST 12B, street vending offers a way to study neoliberalism at the scale of a
+                single workplace. Running a cart means taking on the risks of self-employment.
+                Organizing gives vendors a way to shape some of the rules behind those risks together.
+                We look at what the campaign won and where the cost and paperwork of running a business
+                still fall on individual vendors.
+              </p>
+              <p class="about-question">
+                After decriminalization, what does it take to turn the legal right to vend into a stable livelihood?
+              </p>
+              <div class="about-links">
+                <a href="#org-history">Explore the organization’s history</a>
+                <a href="#voices">Jump to interviews</a>
+              </div>
+            </div>
           `
         },
         {
           id: 'vendors',
           title: 'People',
+          color: '#ffd400',
+          ink: '#0e2a47',
           className: 'section-people',
           html: `
-            <small>BY BRIAN LI</small>
-
             <h2>Who Shares the Sidewalk?</h2>
 
             <p>
@@ -457,6 +670,8 @@
         {
           id: 'map',
           title: 'Why It Matters',
+          color: '#3aaa35',
+          ink: '#fff',
           className: 'section-matters',
           html: `
             <h2>
@@ -482,73 +697,131 @@
           `
         },
         {
+          id: 'org-history',
+          title: 'History',
+          color: '#00a99d',
+          ink: '#0e2a47',
+          className: 'section-org-history',
+          html: `
+            <h2>Inclusive Action for the City</h2>
+            <p>
+              Inclusive Action grew out of local work on economic inequality and became one of the
+              organizations behind the LA Street Vendor Campaign. Here’s how neighborhood organizing
+              led to changes in city and state law and how the work continued once permits became available.
+            </p>
+
+            <ol class="timeline" role="list">
+              <li>
+                <time datetime="2008">2008</time>
+                <div class="timeline-entry">
+                  <h3>Inclusive Action gets its start</h3>
+                  <p>A volunteer group comes together to work on economic development in LA’s lower-income neighborhoods. It incorporates in 2009 as the Leadership for Urban Renewal Network, or LURN.</p>
+                  <a href="https://inclusiveaction.org/about/">Inclusive Action’s origin story</a>
+                </div>
+              </li>
+              <li>
+                <time datetime="2012">2012</time>
+                <div class="timeline-entry">
+                  <h3>The LA Street Vendor Campaign launches</h3>
+                  <p>Organizing in Boyle Heights against police harassment of vendors grows into a citywide campaign. Inclusive Action helps found the coalition, which brings together vendor leaders and community organizations.</p>
+                  <a href="https://antidisplacement.org/profile/los-angeles-california-2/">Read the campaign case study</a>
+                </div>
+              </li>
+              <li>
+                <time datetime="2017">2017</time>
+                <div class="timeline-entry">
+                  <h3>Los Angeles decriminalizes sidewalk vending</h3>
+                  <p>After years of advocacy, the city moves from criminal penalties to administrative fines for sidewalk vending violations.</p>
+                  <a href="https://cityclerk.lacity.org/onlinedocs/2013/13-1493_CA_02-23-2017.pdf">LA City Council’s 2017 decision</a>
+                </div>
+              </li>
+              <li>
+                <time datetime="2018">2018</time>
+                <div class="timeline-entry">
+                  <h3>California changes the law</h3>
+                  <p>California enacts SB 946, the Safe Sidewalk Vending Act, decriminalizing sidewalk vending statewide. That November, the Los Angeles City Council adopts an ordinance establishing a local vending program.</p>
+                  <a href="https://opportunity.lacounty.gov/state-legislation-sidewalk-vending/">LA County’s overview of SB 946</a>
+                  · <a href="https://cityclerk.lacity.org/lacityclerkconnect/index.cfm?cfnumber=13-1493-S5&amp;fa=ccfi.viewrecord">LA City Council records</a>
+                </div>
+              </li>
+              <li>
+                <time datetime="2020">2020</time>
+                <div class="timeline-entry">
+                  <h3>Permits reach the sidewalk</h3>
+                  <p>The City of Los Angeles issues its first sidewalk vending permit in January. In December, Inclusive Action and its partners launch a separate pilot to help vendors in unincorporated LA County navigate permits.</p>
+                  <a href="https://lastreetvendors.org/">The campaign’s first permit announcement</a>
+                  · <a href="https://inclusiveaction.org/sidewalk-vending-programs/">Inclusive Action’s county pilot</a>
+                </div>
+              </li>
+              <li>
+                <time datetime="2022">2022</time>
+                <div class="timeline-entry">
+                  <h3>California revises its food-vending rules</h3>
+                  <p>SB 972 updates the state food code to create a category for compact mobile food operations. The change is intended to make health permits more attainable for vendors selling from carts, stands, and similar setups.</p>
+                  <a href="https://opportunity.lacounty.gov/state-legislation-sidewalk-vending/">LA County’s overview of SB 972</a>
+                </div>
+              </li>
+              <li>
+                <time datetime="2024">2024</time>
+                <div class="timeline-entry">
+                  <h3>Vendors win a challenge to no-vending zones</h3>
+                  <p>Following a lawsuit by vendors and the coalition, Los Angeles repeals no-vending zones in several busy corridors, including the Hollywood Walk of Fame. A settlement provides for canceling citations and issuing refunds.</p>
+                  <a href="https://inclusiveaction.org/blog/street-vendors-can-help-la-chart-the-way-forward-after-historic-legal-settlement-heres-how/">Doug Smith on the settlement</a>
+                </div>
+              </li>
+            </ol>
+          `
+        },
+        {
           id: 'voices',
           title: 'Interviews',
+          color: '#1d71b8',
+          ink: '#fff',
           className: 'section-interviews',
           html: `
-            <small>INTERVIEWS</small>
-
-            <h2>In Conversation with Doug Smith</h2>
-
-            <p>Inclusive Action</p>
-
-            <hr>
-
-            <p>
-              Interview video and organization history forthcoming.
-            </p>
+            <h2>Interviews</h2>
+            <div class="interview-grid"></div>
           `
         },
         {
           id: 'about',
           title: 'Sources',
+          color: '#662d91',
+          ink: '#fff',
           className: 'section-sources',
           html: `
-            <h2>Sources and Credits</h2>
+            <h2>Works Cited</h2>
+
+            <ul class="works-cited" role="list">
+              <li><a href="https://inclusiveaction.org/wp-content/uploads/2025/07/Unfinished_Business_Report_6_2021.pdf">Bennett, Cassidy, et al. <cite>Unfinished Business: How Food Regulations Starve Sidewalk Vendors of Opportunity and What Can Be Done to Finish the Legalization of Street Food.</cite> UCLA School of Law Community Economic Development Clinic and Public Counsel, Aug. 2021.</a></li>
+              <li><a href="https://cityclerk.lacity.org/lacityclerkconnect/index.cfm?cfnumber=13-1493-S5&amp;fa=ccfi.viewrecord">City of Los Angeles, Office of the City Clerk. “Sidewalk Vending Program, Council File 13-1493-S5.” <cite>Council File Management System</cite>, 2018.</a></li>
+              <li><a href="https://inclusiveaction.org/about/">Inclusive Action for the City. “About.”</a></li>
+              <li><a href="https://opportunity.lacounty.gov/state-legislation-sidewalk-vending/">Los Angeles County Department of Economic Opportunity. “State Legislation.”</a></li>
+              <li><a href="https://antidisplacement.org/profile/los-angeles-california-2/">Small Business Anti-Displacement Network. “LA Street Vendor Campaign – Los Angeles, California.” 2 Sept. 2022.</a></li>
+              <li><a href="https://inclusiveaction.org/blog/street-vendors-can-help-la-chart-the-way-forward-after-historic-legal-settlement-heres-how/">Smith, Doug. “Street Vendors Can Help LA Chart the Way Forward After Historic Legal Settlement — Here’s How.” <cite>Inclusive Action for the City</cite>, 26 Aug. 2024.</a></li>
+            </ul>
 
             <dl>
               <dt>Interview</dt>
               <dd>Doug Smith · Inclusive Action</dd>
 
               <dt>Project</dt>
-              <dd>UCLA · HIST 12B</dd>
-
-              <dt>References</dt>
-              <dd>
-                Article and image citations forthcoming.
-              </dd>
+              <dd>Discussion Group 1O · Teaching Assistant: Lucia Alvarez · Course Instructor: Professor Robin D. G. Kelley · Department of History, UCLA</dd>
             </dl>
           `
         }
       ];
 
-      const PALETTE = [
-        { c: '#e6332a', ink: '#fff' },
-        { c: '#f58220', ink: '#0e2a47' },
-        { c: '#ffd400', ink: '#0e2a47' },
-        { c: '#3aaa35', ink: '#fff' },
-        { c: '#00a99d', ink: '#fff' },
-        { c: '#1d71b8', ink: '#fff' },
-        { c: '#662d91', ink: '#fff' },
-        { c: '#e6007e', ink: '#fff' }
-      ];
-
       const N = SECTIONS.length;
-
-      const colors = SECTIONS.map(
-        (_, i) => PALETTE[
-          Math.round(i * PALETTE.length / N) % PALETTE.length
-        ]
-      );
 
       /* Build navigation and editorial sections. */
       const menu = document.getElementById('menu');
       const content = document.getElementById('content');
 
-      SECTIONS.forEach((s, i) => {
+      SECTIONS.forEach(s => {
         const a = document.createElement('a');
         a.href = '#' + s.id;
-        a.style.setProperty('--ink', colors[i].ink);
+        a.style.setProperty('--ink', s.ink);
 
         a.innerHTML = `
           <svg
@@ -558,7 +831,7 @@
           >
             <path
               d="M0 0H100V100Q50 68 0 100Z"
-              fill="${colors[i].c}"
+              fill="${s.color}"
             />
           </svg>
           <span>${s.title}</span>
@@ -569,10 +842,40 @@
         const sec = document.createElement('section');
         sec.className = 'block ' + s.className;
         sec.id = s.id;
-        sec.style.setProperty('--accent', colors[i].c);
+        sec.style.setProperty('--accent', s.color);
         sec.innerHTML = s.html;
 
         content.appendChild(sec);
+      });
+
+      const interviewGrid = content.querySelector('.interview-grid');
+      const interviewTemplate = document.getElementById('interview-card');
+
+      INTERVIEWS.forEach(({ name, description, status, embedUrl, watchUrl }) => {
+        const card = interviewTemplate.content.cloneNode(true);
+        const videoWindow = card.querySelector('.interview-window');
+        card.querySelector('h3').textContent = name;
+        card.querySelector('p').textContent = description;
+        videoWindow.querySelector('small').textContent = status;
+
+        if (embedUrl) {
+          const player = document.createElement('iframe');
+          player.className = videoWindow.className;
+          player.title = `Video interview with ${name}`;
+          player.loading = 'lazy';
+          player.allowFullscreen = true;
+          player.src = embedUrl;
+          videoWindow.replaceWith(player);
+        }
+
+        if (watchUrl) {
+          const link = document.createElement('a');
+          link.href = watchUrl;
+          link.textContent = `Watch the ${name} interview on the video host`;
+          card.querySelector('.interview-description').appendChild(link);
+        }
+
+        interviewGrid.appendChild(card);
       });
 
       /* ----- Draw the umbrella ----- */
@@ -595,7 +898,7 @@
         const a0 = i * step, a1 = a0 + step;
         const [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R), [cx, cy] = pt(a0 + step / 2, R * SAG);
         // Ordered so the half facing the viewer after the spin matches the menu, left to right.
-        el('path', { d: `M0 0 L${x0} ${y0} Q${cx} ${cy} ${x1} ${y1} Z`, fill: colors[(2 * N - 1 - i) % N].c });
+        el('path', { d: `M0 0 L${x0} ${y0} Q${cx} ${cy} ${x1} ${y1} Z`, fill: SECTIONS[(2 * N - 1 - i) % N].color });
       }
       for (let i = 0; i < PANELS; i++) {
         const [x, y] = pt(i * step, R);
