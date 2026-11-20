@@ -297,9 +297,18 @@
       background: #d9ebdb;
     }
 
+    .section-people p {
+      max-width: 65ch;
+    }
+
     .section-people details {
       border-bottom: 1px solid #779585;
       padding: 1em 0;
+    }
+
+    .section-people details:first-of-type {
+      margin-top: 1.25rem;
+      border-top: 1px solid #779585;
     }
 
     .section-people summary {
@@ -307,6 +316,7 @@
       font-family: var(--label);
       font-size: 1.25rem;
       font-weight: 600;
+      scroll-margin-top: calc(var(--bar-h) + 16px);
     }
 
     .section-people summary:focus-visible {
@@ -315,7 +325,24 @@
     }
 
     .section-people details p {
-      padding: .6em 0 0 1.2em;
+      padding: .7em 0 0 1.2em;
+    }
+
+    .section-people a {
+      color: inherit;
+      font-weight: 600;
+      text-underline-offset: .2em;
+    }
+
+    .people-takeaway {
+      margin-top: 2rem;
+      padding-left: 1rem;
+      border-left: 3px solid #527361;
+    }
+
+    .people-interviews {
+      display: inline-block;
+      margin-top: .85rem;
     }
 
     /* Why It Matters — side-by-side comparison. */
@@ -628,43 +655,86 @@
             <h2>Who Shares the Sidewalk?</h2>
 
             <p>
-              Choose a perspective to see how one corner
-              serves different people.
+              A single Los Angeles sidewalk can be a workplace, a place to shop, and a route
+              through the neighborhood. Open each perspective to see what people depend on and
+              how they shape the rules for sharing that space.
             </p>
 
             <details open>
-              <summary>The vendor</summary>
+              <summary>Street vendors</summary>
               <p>
-                For the person slicing fruit, the corner is a
-                workplace. Regular customers know where to find
-                the cart.
+                A fruit vendor buys supplies, prepares food, and sets up before making the first sale.
+                Working in a familiar spot helps regulars find the cart. On a slow day, the vendor
+                still has to cover the cost of the fruit and the time spent preparing it.
+              </p>
+              <p>
+                Patty Archuleta, who sold new and used clothing in South LA, wrote in 2020 about
+                offering affordable goods and building friendships with customers. She also described
+                how vendors on her block pooled supplies for each other’s families during the pandemic.
+                <a href="https://inclusiveaction.org/blog/notes-from-a-street-vendor-patty-archuleta/">Read Patty Archuleta’s account</a>.
               </p>
             </details>
 
             <details>
-              <summary>The customer</summary>
+              <summary>Customers</summary>
               <p>
-                For someone walking to work, the same cart can
-                be a familiar breakfast stop.
+                A fruit cart can be a convenient breakfast stop on the way to work. For someone on a
+                tight budget or between buses, the price and location can decide whether there is
+                time and money to stop for food. Each return visit also helps a vendor build a customer
+                base and decide how much to bring the next day.
               </p>
             </details>
 
             <details>
-              <summary>Neighbors and shopkeepers</summary>
+              <summary>Pedestrians, neighbors, and shopkeepers</summary>
               <p>
-                A parent with a stroller needs a clear path.
-                A shopkeeper needs customers to reach the doorway.
+                A wheelchair user needs a clear path to the curb ramp. A parent with a stroller needs
+                room to pass, and a shopkeeper needs customers to be able to reach the doorway. On a
+                narrow block, where the cart sits and where its customers line up can determine whether
+                everyone can use the sidewalk. Los Angeles sets rules about cart placement and keeping
+                paths and entrances clear. <a href="https://streetsla.lacity.org/sites/default/files/Rules%20and%20Regulations.pdf">Read the city’s vending rules</a>.
               </p>
             </details>
 
             <details>
-              <summary>Officials and organizers</summary>
+              <summary>City officials and health inspectors</summary>
               <p>
-                Public officials shape where vending can take place.
-                Vendors and community groups bring their experience
-                of the sidewalk into those decisions.
+                In the City of Los Angeles, city officials oversee sidewalk vending permits while
+                county health inspectors review food carts and check how vendors handle food. The menu
+                matters. A small stand selling only whole fruit can be exempt from a county health
+                permit. A vendor who cuts fruit on the cart needs a handwashing sink. The cost of
+                meeting those requirements can affect what a vendor chooses to sell.
+                <a href="https://admin.publichealth.lacounty.gov/eh/faq/compact-mobile-food-operation.htm">See LA County’s food cart guidance</a>.
               </p>
             </details>
+
+            <details>
+              <summary>Vendor leaders and community organizers</summary>
+              <p>
+                In January 2024, Yumabeli, a tamale vendor in Walnut Park, joined other vendors at an
+                LA County hearing. She told the Board of Supervisors what it meant to support her family
+                through vending in an area that had no local permit program.
+                <a href="https://inclusiveaction.org/blog/street-vendors-achieve-victories-in-los-angeles-county-and-city/">Read Inclusive Action’s account of the hearing</a>.
+              </p>
+              <p>
+                The board adopted the ordinance on February 6, creating a vending program for
+                unincorporated areas. Inclusive Action and its partners also hold workshops to help
+                vendors navigate the permit process.
+                <a href="https://lacounty.gov/2024/02/06/la-county-adopts-sidewalk-vending-program-in-unincorporated-la-county-for-the-first-time/">Read the county’s announcement</a>.
+                <a href="https://inclusiveaction.org/sidewalk-vending-programs/">Explore the coalition’s permit support</a>.
+              </p>
+            </details>
+
+            <div class="people-takeaway">
+              <h3>Who carries the risk?</h3>
+              <p>
+                In HIST 12B, our discussion of neoliberalism asks who bears the costs and risks of
+                earning a living. A vendor pays for equipment and absorbs losses when sales fall,
+                while public rules help determine where that vendor can earn. By organizing, vendors
+                gain a voice in decisions about permit costs and access to public space.
+              </p>
+              <a class="people-interviews" href="#voices">Explore the project interviews</a>
+            </div>
           `
         },
         {
